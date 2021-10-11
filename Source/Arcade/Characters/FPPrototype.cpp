@@ -3,31 +3,26 @@
 
 #include "Arcade/Characters/FPPrototype.h"
 #include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerInput.h"
 #include "Components/InputComponent.h"
 
 // Sets default values
 AFPPrototype::AFPPrototype()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame. Turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("Spring Arm Component");
-	CameraBoom->SetupAttachment(RootComponent);
-
-	CameraBoom->TargetArmLength = 6.5f;
-	CameraBoom->SetRelativeLocation(FVector(10.5f, 1.7f, 64.f), false);
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera Component");
-	CameraComponent->SetupAttachment(CameraBoom);
+	CameraComponent->SetupAttachment(RootComponent);
+	CameraComponent->bUsePawnControlRotation = true;
 }
 
 // Called when the game starts or when spawned
 void AFPPrototype::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	//...
 }
 
 // Called every frame
@@ -35,10 +30,11 @@ void AFPPrototype::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//...
 }
 
 // Establish the default input binding for this character
-static void InitializeDefaultPawnInputBindings()
+static void InitializeDefaultCharacterInputBindings()
 {
 	bool bBindingsAdded = false;
 	
@@ -47,28 +43,28 @@ static void InitializeDefaultPawnInputBindings()
 		bBindingsAdded = true;
 
 		// Character Movement
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MoveForward", EKeys::W, 1.f));
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MoveForward", EKeys::S, -1.f));
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MoveForward", EKeys::Gamepad_RightY, 1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_MoveForward", EKeys::W, 1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_MoveForward", EKeys::S, -1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_MoveForward", EKeys::Gamepad_RightY, 1.f));
 		
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MoveRight", EKeys::D, 1.f));
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MoveRight", EKeys::A, -1.f));
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("MoveRight", EKeys::Gamepad_RightX, 1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_MoveRight", EKeys::D, 1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_MoveRight", EKeys::A, -1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_MoveRight", EKeys::Gamepad_RightX, 1.f));
 
 		// Camera view
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("TurnRate", EKeys::MouseX, 1.f));
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("TurnRate", EKeys::Gamepad_RightX, 1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_Turn", EKeys::MouseX, 1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_TurnAtRate", EKeys::Gamepad_RightX, 1.f));
 
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("LookUp", EKeys::MouseY, 1.f));
-		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("LookUpRate", EKeys::Gamepad_RightY, 1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_LookUp", EKeys::MouseY, -1.f));
+		UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("AFPPrototype_LookUpAtRate", EKeys::Gamepad_RightY, 1.f));
 		
 		// Jump
-		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jump", EKeys::SpaceBar));
-		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jump", EKeys::Gamepad_FaceButton_Bottom));
+		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_Jump", EKeys::SpaceBar));
+		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_Jump", EKeys::Gamepad_FaceButton_Bottom));
 
 		// Jog
-		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jog", EKeys::LeftShift));
-		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jog", EKeys::Gamepad_LeftTrigger));
+		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_Jog", EKeys::LeftShift));
+		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_Jog", EKeys::Gamepad_LeftTrigger));
 	}
 }
 
@@ -77,12 +73,20 @@ void AFPPrototype::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	InitializeDefaultPawnInputBindings();
-
+	InitializeDefaultCharacterInputBindings();
 	
-	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &AFPPrototype::Jump);
-	PlayerInputComponent->BindAxis("MoveForward", this, &AFPPrototype::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AFPPrototype::MoveRight);
+	PlayerInputComponent->BindAction("AFPPrototype_Jump", EInputEvent::IE_Pressed, this, &AFPPrototype::Jump);
+	
+	PlayerInputComponent->BindAxis("AFPPrototype_MoveForward", this, &AFPPrototype::MoveForward);
+	PlayerInputComponent->BindAxis("AFPPrototype_MoveRight", this, &AFPPrototype::MoveRight);
+	
+	// "turn" handles devices that provide an absolute delta, such as a mouse.
+	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
+	PlayerInputComponent->BindAxis("AFPPrototype_LookUpAtRate", this, &AFPPrototype::LookUpAtRate);
+	PlayerInputComponent->BindAxis("AFPPrototype_LookUp", this, &APawn::AddControllerPitchInput);
+	
+	PlayerInputComponent->BindAxis("AFPPrototype_TurnAtRate", this, &AFPPrototype::TurnAtRate);
+	PlayerInputComponent->BindAxis("AFPPrototype_Turn", this, &APawn::AddControllerYawInput);
 }
 
 // Character Move Forward
@@ -103,8 +107,23 @@ void AFPPrototype::MoveRight(float Value)
 	}
 }
 
+void AFPPrototype::TurnAtRate(float Value)
+{
+	if (Value != 0.f)
+	{
+		AddControllerYawInput(Value * BaseRate * GetWorld()->GetDeltaSeconds());
+	}
+}
 
-// Character jump
+void AFPPrototype::LookUpAtRate(float Value)
+{
+	if (Value != 0.f)
+	{
+		AddControllerPitchInput(Value * BaseRate * GetWorld()->GetDeltaSeconds());
+	}
+}
+
+// Make the character jump
 void AFPPrototype::Jump()
 {
 	Super::Jump();
