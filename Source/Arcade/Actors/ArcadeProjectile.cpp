@@ -3,6 +3,8 @@
 #include "Arcade/Actors/ArcadeProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "kismet/GameplayStatics.h"
+#include "GameFramework/DamageType.h"
 
 AArcadeProjectile::AArcadeProjectile() 
 {
@@ -33,11 +35,21 @@ AArcadeProjectile::AArcadeProjectile()
 
 void AArcadeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
+	// Add impulse, apply damage and destroy projectile if we hit a physics
+	AActor* MyOwner = GetOwner();
+	if (MyOwner == nullptr)
+	{
+		return;
+	}
+	AController* MyOwnerInstigator = MyOwner->GetInstigatorController();
+	
+	// Returns a UClass* representing this class (UDamageType)
+	UClass* DamageTypeClass = UDamageType::StaticClass();
+	
+	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherActor != MyOwner) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
+		UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, MyOwnerInstigator, this, DamageTypeClass);
 		Destroy();
 	}
 }

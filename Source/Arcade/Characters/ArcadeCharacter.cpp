@@ -144,13 +144,15 @@ void AArcadeCharacter::OnFire()
 	if (ProjectileClass != nullptr)
 	{
 		UWorld* const World = GetWorld();
+		AArcadeProjectile* Projectile;
 		if (World != nullptr)
 		{
 			if (bUsingMotionControllers)
 			{
 				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
 				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AArcadeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				Projectile = World->SpawnActor<AArcadeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				Projectile->SetOwner(this);
 			}
 			else
 			{
@@ -163,7 +165,8 @@ void AArcadeCharacter::OnFire()
 				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 				// spawn the projectile at the muzzle
-				World->SpawnActor<AArcadeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				Projectile = World->SpawnActor<AArcadeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				Projectile->SetOwner(this);
 			}
 		}
 	}

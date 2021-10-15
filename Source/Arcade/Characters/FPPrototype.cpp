@@ -1,28 +1,43 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Arcade/Characters/FPPrototype.h"
+#include "MatineeCameraShake.h"
+#include "Arcade/PlayerControllers/FPPrototypeController.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerInput.h"
 #include "Components/InputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AFPPrototype::AFPPrototype()
 {
- 	// Set this character to call Tick() every frame. Turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Sets default value for turn and lookup rate
+	BaseTurnRate = 45.f;
+	BaseLookUpRate = 45.f;
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera Component");
 	CameraComponent->SetupAttachment(RootComponent);
 	CameraComponent->bUsePawnControlRotation = true;
+
+
+	GetCharacterMovement()->MaxWalkSpeed = 150.f;
 }
+
+void AFPPrototype::SetCharcterMovementSpeed(float Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = Value;
+}
+
 
 // Called when the game starts or when spawned
 void AFPPrototype::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//...
+	CharacterController = Cast<AFPPrototypeController>(GetWorld()->GetFirstPlayerController());
 }
 
 // Called every frame
@@ -64,7 +79,9 @@ static void InitializeDefaultCharacterInputBindings()
 
 		// Jog
 		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_Jog", EKeys::LeftShift));
+		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_ResetJog", EKeys::LeftShift));
 		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_Jog", EKeys::Gamepad_LeftTrigger));
+		UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("AFPPrototype_ResetJog", EKeys::Gamepad_LeftTrigger));
 	}
 }
 
@@ -87,6 +104,9 @@ void AFPPrototype::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	PlayerInputComponent->BindAxis("AFPPrototype_TurnAtRate", this, &AFPPrototype::TurnAtRate);
 	PlayerInputComponent->BindAxis("AFPPrototype_Turn", this, &APawn::AddControllerYawInput);
+
+	PlayerInputComponent->BindAction("AFPPrototype_Jog", EInputEvent::IE_Pressed, this, &AFPPrototype::Jog);
+	PlayerInputComponent->BindAction("AFPPrototype_ResetJog", EInputEvent::IE_Released, this, &AFPPrototype::ResetValue);
 }
 
 // Character Move Forward
@@ -94,6 +114,8 @@ void AFPPrototype::MoveForward(float Value)
 {
 	if (Value != 0.f)
 	{
+		// TODO: Implement camera shake 
+		// CharacterController->ClientStartCameraShake( )
 		AddMovementInput(GetActorForwardVector(), Value);
 	}
 }
@@ -107,19 +129,21 @@ void AFPPrototype::MoveRight(float Value)
 	}
 }
 
+// Handles camera left/right rotation for gamepad
 void AFPPrototype::TurnAtRate(float Value)
 {
 	if (Value != 0.f)
 	{
-		AddControllerYawInput(Value * BaseRate * GetWorld()->GetDeltaSeconds());
+		AddControllerYawInput(Value * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 	}
 }
 
+// Handles camera up/down rotation for gamepad
 void AFPPrototype::LookUpAtRate(float Value)
 {
 	if (Value != 0.f)
 	{
-		AddControllerPitchInput(Value * BaseRate * GetWorld()->GetDeltaSeconds());
+		AddControllerPitchInput(Value * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 	}
 }
 
@@ -130,4 +154,17 @@ void AFPPrototype::Jump()
 
 	bPressedJump = true;
 	JumpKeyHoldTime = 0.0f;
+}
+
+// Make the character jog
+void AFPPrototype::Jog()
+{
+	// TODO: Lerp MaxWalkSpeed value
+	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+}
+
+void AFPPrototype::ResetValue()
+{
+	// TODO: Lerp MaxWalkSpeed value
+	GetCharacterMovement()->MaxWalkSpeed =150.f;
 }

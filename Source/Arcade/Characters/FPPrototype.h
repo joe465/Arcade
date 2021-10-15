@@ -31,6 +31,8 @@ protected:
 	// Handles camera up/down rotation for gamepad
 	void LookUpAtRate(float Value);
 
+	void Jog();
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -45,6 +47,23 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Components")
 		class UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Camera")
-		float BaseRate = 100.f;
+	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
+		TSubclassOf<class UHeadBob> HeadBob;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+		float BaseLookUpRate;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+		float BaseTurnRate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
+		float HeadBobScale = 0.65f;
+
+	class AFPPrototypeController* CharacterController;
+	
+	void SetCharcterMovementSpeed(float Value);
+
+	void ResetValue();
+	
+	// TODO: Implement "Head bob"
 };

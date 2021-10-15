@@ -22,6 +22,9 @@ class AArcadeProjectile : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	float BaseDamage = 50.f;
+
 public:
 	AArcadeProjectile();
 
