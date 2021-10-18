@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Badsardines 2021.
 
 #pragma once
 
@@ -31,4 +31,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	class USphereComponent* Root;
 
+
+	float floatExp = 100.f;
 };

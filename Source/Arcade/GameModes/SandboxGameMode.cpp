@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Badsardines 2021.
 
 
 #include "Arcade/GameModes/SandboxGameMode.h"

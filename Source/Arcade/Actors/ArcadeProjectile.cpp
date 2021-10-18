@@ -49,7 +49,9 @@ void AArcadeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherActor != MyOwner) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		// Generates HitEvent
 		UGameplayStatics::ApplyDamage(OtherActor, BaseDamage, MyOwnerInstigator, this, DamageTypeClass);
+		// Destroy the projectile`
 		Destroy();
 	}
 }
