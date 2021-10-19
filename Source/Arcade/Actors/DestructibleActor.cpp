@@ -31,5 +31,7 @@ void ADestructibleActor::Tick(float DeltaTime)
 	
 }
 
-
-
+void ADestructibleActor::TeleportToDefault()
+{
+	Mesh->SetWorldLocation(FVector(-200.f, 0.f, 1250.f));
+}

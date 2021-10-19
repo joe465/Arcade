@@ -16,11 +16,11 @@ class AArcadeProjectile : public AActor
 
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	USphereComponent* CollisionComp;
+	USphereComponent* CollisionComp = nullptr;
 
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
+	UProjectileMovementComponent* ProjectileMovement = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float BaseDamage = 50.f;

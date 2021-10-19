@@ -29,7 +29,7 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	class USphereComponent* Root;
+	class USphereComponent* Root = nullptr;
 
 
 	float floatExp = 100.f;

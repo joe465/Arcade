@@ -14,7 +14,8 @@ class ARCADE_API ADestructibleActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ADestructibleActor();
-	
+
+	void TeleportToDefault();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,8 +26,8 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
-		UStaticMeshComponent* Mesh;
+		UStaticMeshComponent* Mesh = nullptr;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Health")
-		class UHealthComponent* HealthComp;
+		class UHealthComponent* HealthComp = nullptr;
 };
